@@ -1,0 +1,54 @@
+# Python bytecode files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# Virtual environments
+.env
+.venv/
+.venv
+env/
+venv/
+ENV/
+virtualenv/
+
+# Log files
+*.log
+rag_app.log
+
+# Index and data storage directories
+# Uncomment if you want to exclude them from git
+meu_indice/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Local development settings
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS specific files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Environment variables
+.env
+.env.*
+
+# Large PDF files
+# Uncomment if you want to ignore PDFs in my_docs
+my_docs/*.pdf
