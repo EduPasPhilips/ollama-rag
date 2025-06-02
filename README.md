@@ -11,31 +11,81 @@ This application provides a Retrieval-Augmented Generation (RAG) system using Ol
 - **Citation Support**: Shows document sources for responses
 - **Configurable**: Command-line options to customize behavior
 - **Token Counting**: Tracks token usage for input and output
+- **Automatic Virtual Environment**: Creates and activates a virtual environment automatically
 
 ## Requirements
 
-- Python 3.8+
+- Python 3.8+ (on Ubuntu, use `python3`)
 - Ollama running locally (or remotely with URL configuration)
 - PDFs and/or Markdown documents in the `my_docs` folder
+- `python3-venv` package (usually pre-installed on most Linux distributions)
 
-## Installation
+## Installation and Setup
 
+### First-time setup on a new computer
+
+1. Clone the repository:
+   ```bash
+   git clone <your-repository-url> ollama-rag
+   cd ollama-rag
+   ```
+
+2. Run the application:
+   ```bash
+   python3 main.py
+   ```
+
+   The script will automatically:
+   - Create a virtual environment in a `venv` directory
+   - Install all required dependencies from the `requirements.txt` file
+   - Activate the environment and run the application
+
+### Running the application after setup
+
+Simply run:
 ```bash
-pip install llama-index rich
+python3 main.py
 ```
+
+The script will detect the existing virtual environment and automatically activate it.
+
+### Manual installation (if automatic setup fails)
+
+If you prefer to set up manually:
+
+1. Create and activate a virtual environment:
+   ```bash
+   # On Linux/macOS:
+   python3 -m venv venv
+   source venv/bin/activate
+   
+   # On Windows:
+   python -m venv venv
+   .\venv\Scripts\activate
+   ```
+
+2. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. Run the application:
+   ```bash
+   python main.py
+   ```
 
 ## Usage
 
 Basic usage:
 
 ```bash
-python main_improved_en.py
+python3 main.py
 ```
 
 With options:
 
 ```bash
-python main_improved_en.py --llm phi3 --stream --top-k 5
+python3 main.py --llm phi3 --stream --top-k 5
 ```
 
 ### Command-line Arguments
@@ -62,6 +112,25 @@ While using the application, you can use these special commands:
 - `!rebuild`: Completely rebuild the document index
 - `exit`, `quit`: Exit the application
 
+## Troubleshooting
+
+### Common issues:
+
+1. **Missing Python**: If you see `Command 'python' not found`, use `python3` instead (common on Ubuntu)
+2. **Missing virtual environment package**: If you get errors creating the virtual environment:
+   ```bash
+   sudo apt-get update && sudo apt-get install -y python3-venv
+   ```
+3. **Ollama not running**: If you see connection errors, make sure Ollama is running:
+   ```bash
+   ollama serve
+   ```
+4. **Missing models**: If models aren't found, download them with:
+   ```bash
+   ollama pull phi3
+   ollama pull all-minilm
+   ```
+
 ## Improvements
 
 1. **Better User Interface**: Rich text formatting for clarity
@@ -74,6 +143,7 @@ While using the application, you can use these special commands:
 8. **Token Counting**: Track token usage for optimization
 9. **Special Commands**: Interactive commands during chat session
 10. **Code Organization**: Better function structure and documentation
+11. **Automatic Virtual Environment**: Seamless environment management
 
 ## Example
 

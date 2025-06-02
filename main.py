@@ -9,17 +9,56 @@ Features:
 - Citation support to track sources
 - Stream mode option for real-time responses
 - Post-processing with similarity threshold
+- Automatic virtual environment activation
 """
 
 import os
+import sys
 import time
 import logging
 import argparse
+import subprocess
 from typing import List, Optional
 from rich.console import Console
 from rich.markdown import Markdown
 from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TimeElapsedColumn
 from rich import print as rprint
+
+# Verificação e ativação do ambiente virtual (venv)
+def ensure_venv():
+    """Verifica se está rodando em um ambiente virtual, se não, tenta ativar ou criar um."""
+    # Verifica se já está em um ambiente virtual
+    if hasattr(sys, 'real_prefix') or (hasattr(sys, 'base_prefix') and sys.base_prefix != sys.prefix):
+        return True  # Já está em um ambiente virtual
+    
+    # Usar print padrão aqui porque o rico pode não estar disponível ainda
+    print("Verificando ambiente virtual...")
+    venv_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "venv")
+    
+    # Verifica se o ambiente virtual já existe
+    if not os.path.exists(venv_dir):
+        print("Ambiente virtual não encontrado. Criando...")
+        try:
+            subprocess.run([sys.executable, "-m", "venv", venv_dir], check=True)
+            print("Ambiente virtual criado com sucesso.")
+        except subprocess.CalledProcessError as e:
+            print(f"Erro ao criar ambiente virtual: {e}")
+            return False
+    
+    # Determina o caminho para o script de ativação baseado no sistema
+    if sys.platform == "win32":
+        activate_script = os.path.join(venv_dir, "Scripts", "python.exe")
+    else:  # Linux/Mac
+        activate_script = os.path.join(venv_dir, "bin", "python")
+    
+    if os.path.exists(activate_script):
+        # Re-executa o script atual com o Python do ambiente virtual
+        print("Ativando ambiente virtual...")
+        os.execv(activate_script, [activate_script] + sys.argv)
+    else:
+        print(f"Não foi possível encontrar o script de ativação: {activate_script}")
+        return False
+
 from llama_index.core import (
     SimpleDirectoryReader,
     VectorStoreIndex,
@@ -415,6 +454,11 @@ def print_welcome():
 
 def main():
     """Main function to run the RAG application."""
+    # Ativar o ambiente virtual antes de mais nada
+    if not ensure_venv():
+        print("[red]Falha ao garantir o ambiente virtual. Saindo...[/red]")
+        return
+    
     # Parse command line arguments
     args = parse_arguments()
     
@@ -536,4 +580,24 @@ def main():
             continue
 
 if __name__ == "__main__":
+    # Garantir que estamos em um ambiente virtual antes de continuar
+    ensure_venv()
+    
+    # Verificar se as dependências estão instaladas
+    try:
+        import rich
+        import llama_index
+    except ImportError:
+        # Use print comum aqui porque rich pode não estar disponível
+        print("Instalando dependências necessárias...")
+        try:
+            subprocess.run([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"], check=True)
+            print("Dependências instaladas com sucesso.")
+            # Não precisamos recarregar aqui, pois o script já será reiniciado
+            # dentro do ambiente virtual
+        except Exception as e:
+            print(f"Erro ao instalar dependências: {e}")
+            sys.exit(1)
+    
+    # Continue com a execução normal do programa
     main()
